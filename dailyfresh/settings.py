@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 
+from django.conf.global_settings import DEFAULT_FILE_STORAGE
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -40,8 +42,15 @@ INSTALLED_APPS = (
     'apps.users',
     'apps.goods',
     'apps.cart',
-    'apps.orders'
+    'apps.orders',
+    'tinymce',
 )
+
+TINYMCE_DEFAULT_CONFIG = {
+    'theme':'advanced', #丰富样式
+    'width':600,
+    'height':400,
+}
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -115,3 +124,21 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR , 'static')]
 
 # 设置模型类
 AUTH_USER_MODEL = 'users.User'
+
+# 邮件发送配置
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'    # 导入邮件模块
+EMAIL_HOST = 'smtp.163.com'                 # 发邮件主机
+EMAIL_PORT = 25                             # 发邮件端口
+EMAIL_HOST_USER = '13798076559@163.com'       # 发件人邮件
+EMAIL_HOST_PASSWORD = 'yuqiong114'           # 邮箱授权时获得授权码，非注册登录密码
+EMAIL_FROM = '天天生鲜<13798076559@163.com>'   # 邮件中的显示的发件人, 邮箱需要与发件人邮箱一致
+
+# session数据缓存到redis中
+SESSION_ENGIN = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"
+
+# 配置loginRequired装饰器使用，没有登陆跳转到此地址
+LOGIN_URL = '/users/login'
+
+# 使用自定义的文件存储类
+DEFAULT_FILE_STORAGE = 'utils.fastdfs.storage.FdfsStorage'

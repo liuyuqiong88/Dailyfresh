@@ -1,0 +1,69 @@
+
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block body %}
+    <div class="center_con clearfix">
+		<ul class="subnav fl">
+            {% for foo in gategorise %}
+                <li><a href="#model0"+{{forloop.counter }} class={{  foo.logo }}>{{  foo.name }}</a></li>
+            {% endfor %}
+
+
+		</ul>
+		<div class="slide fl">
+			<ul class="slide_pics">
+                {% for foo in slide %}
+                    <li><img src= "http://127.0.0.1:8888/{{ foo.image }}"  alt="幻灯片"></li>
+                {% endfor %}
+
+			</ul>
+			<div class="prev"></div>
+			<div class="next"></div>
+			<ul class="points"></ul>
+		</div>
+		<div class="adv fl">
+            {% for foo in promotion %}
+                <a href="#"><img src="http://127.0.0.1:8888/{{ foo.image }}"></a>
+            {% endfor %}
+
+		</div>
+	</div>
+    {% for foo in gategorise %}
+    <div class="list_model">
+		<div class="list_title clearfix">
+			<h3 class="fl" id="model0{{ forloop.counter }}">{{ foo.name }}</h3>
+			<div class="subtitle fl">
+				<span>|</span>
+
+                {% for text_sku in foo.text_skus %}
+                    <a href="#">{{ text_sku.sku.name }}</a>
+                {% endfor %}
+
+			</div>
+			<a href="#" class="goods_more fr" id="fruit_more">查看更多 ></a>
+		</div>
+
+
+
+
+		<div class="goods_con clearfix">
+			<div class="goods_banner fl"><img src="http://127.0.0.1:8888/{{ foo.image }}"></div>
+			<ul class="goods_list fl">
+
+                {% for imgs_sku in foo.imgs_skus %}
+                    <li>
+                        <h4><a href="#">{{ imgs_sku.sku.name }}</a></h4>
+                        <a href="#"><img src="http://127.0.0.1:8888/{{ imgs_sku.sku.default_image}}"></a>
+                        <div class="prize">{{ imgs_sku.sku.print }}</div>
+                    </li>
+                {% endfor %}
+
+
+			</ul>
+		</div>
+	</div>
+
+    {% endfor %}
+
+
+{% endblock %}

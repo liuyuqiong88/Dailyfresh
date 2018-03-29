@@ -15,12 +15,16 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
+import tinymce.urls
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^cart/$' ,include('apps.cart.urls',namespace='cart')),
-    url(r'^users/$' ,include('apps.users.urls',namespace='users')),
-    url(r'^orders/$' ,include('apps.orders.urls',namespace='orders')),
-    url(r'^' ,include('apps.goods.urls',namespace='goods')),
+    url(r'^cart/' ,include('apps.cart.urls',namespace='cart')),
+    url(r'^users/' ,include('apps.users.urls',namespace='users')),
+    url(r'^orders/',include('apps.orders.urls',namespace='orders')),
+    url(r'^goods/', include('apps.goods.urls',namespace='goods')),
+
+    url(r'^', include('apps.goods.urls',namespace='goods')),
+    url(r'^tinymce/', include('tinymce.urls')),
 
 ]

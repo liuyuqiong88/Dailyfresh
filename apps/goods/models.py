@@ -69,6 +69,10 @@ class GoodsImage(BaseMedel):
     def __str__(self):
         return str(self.sku)
 
+    class Meta:
+        verbose_name = '商品图片'
+        verbose_name_plural = verbose_name
+
 class IndexSlideGoods(BaseMedel):
     """主页轮播商品展示"""
 

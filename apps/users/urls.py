@@ -16,6 +16,16 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 
-urlpatterns = [
+# import views
+from apps.users.views import *
 
+urlpatterns = [
+    url(r'^register$' ,RegisteView.as_view(),name='register'),
+    url(r'^active/(.*)$' ,ActiveView.as_view(),name='active'),
+    url(r'^login$', LoginView.as_view(),name='login'),
+    url(r'^logout$', LogoutView.as_view(),name='logout'),
+
+    url(r'^order$',UserOrderView.as_view(),name='order'),
+    url(r'^address$',UserAddressView.as_view(),name='address'),
+    url(r'^' , UserInfoView.as_view(),name='info'),
 ]
