@@ -2,6 +2,20 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
 {% block body %}
+
+    <div class="navbar_con">
+		<div class="navbar">
+			<h1 class="fl">全部商品分类</h1>
+			<ul class="navlist fl">
+				<li><a href="">首页</a></li>
+				<li class="interval">|</li>
+				<li><a href="">手机生鲜</a></li>
+				<li class="interval">|</li>
+				<li><a href="">抽奖</a></li>
+			</ul>
+		</div>
+	</div>
+
     <div class="center_con clearfix">
 		<ul class="subnav fl">
             {% for foo in gategorise %}
@@ -13,7 +27,7 @@
 		<div class="slide fl">
 			<ul class="slide_pics">
                 {% for foo in slide %}
-                    <li><img src= "http://127.0.0.1:8888/{{ foo.image }}"  alt="幻灯片"></li>
+                    <li><img src= "{{ foo.image.url }}"  alt="幻灯片"></li>
                 {% endfor %}
 
 			</ul>
@@ -23,7 +37,7 @@
 		</div>
 		<div class="adv fl">
             {% for foo in promotion %}
-                <a href="#"><img src="http://127.0.0.1:8888/{{ foo.image }}"></a>
+                <a href="#"><img src="{{ foo.image.url }}"></a>
             {% endfor %}
 
 		</div>
@@ -47,13 +61,13 @@
 
 
 		<div class="goods_con clearfix">
-			<div class="goods_banner fl"><img src="http://127.0.0.1:8888/{{ foo.image }}"></div>
+			<div class="goods_banner fl"><img src="{{ foo.image.url }}"></div>
 			<ul class="goods_list fl">
 
                 {% for imgs_sku in foo.imgs_skus %}
                     <li>
                         <h4><a href="#">{{ imgs_sku.sku.name }}</a></h4>
-                        <a href="#"><img src="http://127.0.0.1:8888/{{ imgs_sku.sku.default_image}}"></a>
+                        <a href="#"><img src="{{ imgs_sku.sku.default_image.url}}"></a>
                         <div class="prize">{{ imgs_sku.sku.print }}</div>
                     </li>
                 {% endfor %}
@@ -64,6 +78,24 @@
 	</div>
 
     {% endfor %}
+{% block bottom_js %}
+    <script type="text/javascript" src="js/slideshow.js"></script>
+	<script type="text/javascript">
+		BCSlideshow('focuspic');
+		var oFruit = document.getElementById('fruit_more');
+		var oShownum = document.getElementById('show_count');
 
+		var hasorder = localStorage.getItem('order_finish');
+
+		if(hasorder)
+		{
+			oShownum.innerHTML = '2';
+		}
+
+		oFruit.onclick = function(){
+			window.location.href = 'list.html';
+		}
+	</script>
+{% endblock %}
 
 {% endblock %}

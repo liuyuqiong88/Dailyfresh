@@ -46,6 +46,7 @@ class IndexView(View):
             i.text_skus = text_skus
             i.imgs_skus = imgs_skus
 
+
         cart_count = 12
 
         data = {
