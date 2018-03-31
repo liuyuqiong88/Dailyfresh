@@ -43,7 +43,7 @@ class GoodsSKU(BaseMedel):
     name = models.CharField(max_length=100,verbose_name='名称')
     title = models.CharField(max_length=200,verbose_name='简介')
     unit = models.CharField(max_length=10,verbose_name='销售单位')
-    print = models.DecimalField(max_digits=10,decimal_places=2,verbose_name='价格')
+    price = models.DecimalField(max_digits=10,decimal_places=2,verbose_name='价格')
     stock = models.IntegerField(default=0,verbose_name='库存')
     sales = models.IntegerField(default=0,verbose_name='销量')
     default_image = models.ImageField(upload_to='goods',verbose_name='图片')

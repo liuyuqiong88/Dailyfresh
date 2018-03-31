@@ -9,9 +9,14 @@
 from django.conf import settings
 from celery import Celery
 from django.core.mail import send_mail
+from django.template import loader
+
+from apps.goods.models import *
+from apps.orders.models import *
 
 app = Celery('celery_tasks.tasks',broker='redis://127.0.0.1:6379/1')
 
+# 用异步celery去生成激活邮件
 @app.task
 def send_active_mail(self, username, email, token):
     """
@@ -35,3 +40,46 @@ def send_active_mail(self, username, email, token):
 
     # 调研django的send_mail　方法发送邮件
     send_mail(subject, message, from_email, recipient_list, html_message=html_message)
+
+# 用celery生成静态首页
+@app.task
+def generate_static_index_html():
+    """生成静态的首页:index.html"""
+
+    # 查询首页中要显示的数据
+    # 所有的商品类别
+    categories = GoodsCategory.objects.all()
+    # 主页轮播商品
+    slide = IndexSlideGoods.objects.all()
+    # 主页促销活动
+    promotion = IndexPromotion.objects.all()
+    # 主页分类展示
+    for i in categories:
+    # 查询当前类别所有文字商品和图片商品
+        text_skus = IndexCategoryGoods.objects.filter(category=i,display_type=0)
+
+        #     动态地给类别对象，新增属性
+        imgs_skus = IndexCategoryGoods.objects.filter(category=i, display_type=1).order_by('index')
+        i.text_skus = text_skus
+        i.imgs_skus = imgs_skus
+
+
+    cart_count = 0
+
+    data = {
+        'categorise': categories,
+        'slide': slide,
+        'promotion': promotion,
+        'cart_count': cart_count,
+
+    }
+
+    # 获取模板文件生存ｈｔｍｌ文件
+    template = loader.get_template('index.html')
+
+    index_html = template.render(data)
+
+    file_path = '/home/python/Desktop/celery_server/static/indexq.html'
+
+    with open(file_path,'w') as f :
+        f.write(index_html)

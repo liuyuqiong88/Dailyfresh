@@ -142,3 +142,16 @@ LOGIN_URL = '/users/login'
 
 # 使用自定义的文件存储类
 DEFAULT_FILE_STORAGE = 'utils.fastdfs.storage.FdfsStorage'
+
+
+
+# 使用redis来保存session数据, 并作为项目的缓存
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/2",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
