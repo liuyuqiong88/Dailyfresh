@@ -25,7 +25,7 @@ urlpatterns = [
     url(r'^login$', LoginView.as_view(),name='login'),
     url(r'^logout$', LogoutView.as_view(),name='logout'),
 
-    url(r'^order$',UserOrderView.as_view(),name='order'),
+    # url(r'^order$',UserOrderView.as_view(),name='order'),
     url(r'^address$',UserAddressView.as_view(),name='address'),
     url(r'^' , UserInfoView.as_view(),name='info'),
 ]

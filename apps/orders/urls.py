@@ -16,6 +16,20 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 
-urlpatterns = [
+from apps.orders.views import *
 
+
+
+
+
+urlpatterns = [
+    url(r'^order/(?P<page_num>\d+)',UserOrderView.as_view(),name='order'),
+    # 确认订单
+    url(r'^place$', PlaceOrderView.as_view(), name='place'),
+
+    url(r'^commit$', CommitOrderView.as_view(), name='commit'),
+
+    url(r'^pay$', OrderPayView.as_view(), name='pay'),
+    url(r'^check$', CheckPayView.as_view(), name='check'),
+    url(r'^delete', DeleteOrderView.as_view(), name='delete'),
 ]

@@ -16,6 +16,10 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 
-urlpatterns = [
+from apps.cart.views import *
 
+urlpatterns = [
+    url(r'^add$', AddCartView.as_view(), name='add'),
+    url(r'^$', CartInfoView.as_view(), name='info'),
+    url(r'update$', UpdateCartView.as_view(), name='update'),
 ]

@@ -5,9 +5,13 @@ from django.db.utils import IntegrityError
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 import re
-from itsdangerous import TimedJSONWebSignatureSerializer,SignatureExpired
-import settings
 
+import settings
+from apps.goods.models import *
+from django_redis import get_redis_connection
+from itsdangerous import TimedJSONWebSignatureSerializer,SignatureExpired
+from dailyfresh.settings import *
+from redis import *
 from utils.common import LoginRequiredView
 
 # Create your views here.
@@ -167,13 +171,14 @@ class LoginView(View):
         else:
             return redirect(next_url)
 
+
 class LogoutView(View):
 
      def get(self,request):
 
          logout(request)
 
-         return redirect(reverse('users:login'))
+         return redirect(reverse('goods:index'))
 
 
 class UserInfoView(LoginRequiredView,View):
@@ -189,16 +194,27 @@ class UserInfoView(LoginRequiredView,View):
 
             address = None
 
-        data = {'which_page': 0 ,'address':address}
+        strict_redis = get_redis_connection()
+        history_key = 'history_%s' % request.user.id
+
+        his_list = strict_redis.lrange(history_key,0,-1)
+
+        his_list = [i.decode() for i in his_list]
+
+        skus = GoodsSKU.objects.filter(id__in=his_list)
+
+
+
+        data = {'which_page': 0 ,'address':address, 'skus': skus}
 
         return render(request,'user_center_info.html',data)
 
-class UserOrderView(LoginRequiredView,View):
-    """用户中心:订单显示界面"""
-    def get(self,request):
-
-        data = {'which_page':1}
-        return render(request,'user_center_order.html',data)
+# class UserOrderView(LoginRequiredView,View):
+#     """用户中心:订单显示界面"""
+#     def get(self,request):
+#
+#         data = {'which_page':1}
+#         return render(request,'user_center_order.html',data)
 
 class UserAddressView(LoginRequiredView,View):
     """用户中心:地址界面"""

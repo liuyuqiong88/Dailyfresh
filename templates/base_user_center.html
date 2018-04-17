@@ -19,7 +19,7 @@
                        {% if which_page == 0 %}class="active"{% endif %}
                 >· 个人信息</a></li>
 
-                <li><a href="{% url 'users:order' %}"
+                <li><a href="{% url 'orders:order' 1 %}"
                        {% if which_page == 1 %}class="active"{% endif %}
                 >· 全部订单</a></li>
                 <li><a href="{% url 'users:address' %}"

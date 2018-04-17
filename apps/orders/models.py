@@ -28,7 +28,7 @@ class OrderInfo(BaseMedel):
     trans_cost = models.DecimalField(max_digits=10,decimal_places=2,verbose_name="运费")
     pay_method = models.SmallIntegerField(choices=PAY_METHOD_CHOICES,default=1,verbose_name="支付方式")
     status = models.SmallIntegerField(choices=ORDER_STATUS_CHOICES,default=1,verbose_name="订单状态")
-    trade_no = models.CharField(max_length=100,default='',unique=True,null=True,blank=True,verbose_name="支付编号")
+    trade_no = models.CharField(max_length=100,default='',null=True,blank=True,verbose_name="支付编号")
     address = models.ForeignKey(Address,verbose_name="收货地址")
     user = models.ForeignKey(User,verbose_name="下单用户")
 
@@ -38,7 +38,7 @@ class OrderInfo(BaseMedel):
         verbose_name_plural = verbose_name
 
     def __str__(self):
-        return (self.user,self.order_id)
+        return (self.order_id)
 
 
 class OrderGoods(BaseMedel):
@@ -54,4 +54,7 @@ class OrderGoods(BaseMedel):
         db_table = 'df_order_goods'
         verbose_name = '订单商品'
         verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return (self.sku.name)
 

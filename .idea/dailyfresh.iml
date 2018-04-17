@@ -18,8 +18,6 @@
       <sourceFolder url="file://$MODULE_DIR$/apps/orders" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/apps/cart" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/apps/users" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/apps" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$" isTestSource="false" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.5.2 virtualenv at ~/.virtualenvs/django_py3" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -30,6 +28,7 @@
       <list>
         <option value="$MODULE_DIR$/templates" />
         <option value="$MODULE_DIR$/apps" />
+        <option value="$MODULE_DIR$" />
       </list>
     </option>
   </component>

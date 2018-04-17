@@ -46,9 +46,6 @@
                             <div class="prize">￥3.90</div>
                         </li>
                     {% endfor %}
-
-
-
 				</ul>
 			</div>
 		</div>
@@ -70,7 +67,6 @@
 			</div>
 
 			<ul class="goods_type_list clearfix">
-
                 {% for sku in page %}
                 <li>
 					<a href={% url 'goods:detail' sku.id %}><img src={{ sku.default_image.url }}></a>
@@ -82,30 +78,24 @@
 					</div>
 				</li>
                 {% endfor %}
-
-
 			</ul>
 
 			<div class="pagenation">
                 {% if page.number > 1 %}
                     <a href="{% url 'goods:list' cho_category.id  page.previous_page_number %}?sort=default">&lt;&lt;上一页 </a>
                 {% endif %}
-
                 {% for foo in paginator.page_range %}
                     {% if  foo  ==  page.number  %}
                         <a href="#" class="active">{{ foo }}</a>
-
                     {% else %}
                         <a href="{% url 'goods:list' cho_category.id  foo %}?sort=default">{{ foo }}</a>
                     {% endif %}
-
                 {% endfor %}
-
                 {% if  page.number  <  paginator.num_pages %}
                     <a href="{% url 'goods:list' cho_category.id  page.next_page_number %}?sort=default">下一页&gt;&gt;</a>
                 {% endif %}
-
 			</div>
+
 		</div>
 	</div>
 

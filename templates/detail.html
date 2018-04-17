@@ -59,7 +59,7 @@
 			<div class="total">总价：<em>{{ goods_sku.price }}元</em></div>
 			<div class="operate_btn">
 				<a href="javascript:;" class="buy_btn">立即购买</a>
-				<a href="javascript:;" class="add_cart" id="add_cart">加入购物车</a>
+				<a href="javascript:;" class="add_cart" id="add_cart" sku_id="{{ goods_sku.id }}">加入购物车</a>
 			</div>
 		</div>
 	</div>
@@ -102,32 +102,82 @@
 
 
     <div class="add_jump"></div>
+{% csrf_token %}
+
+
+{% endblock body%}
+
 
     {% block bottom_js %}
-        <script type="text/javascript" src={% static 'js/jquery-1.12.4.min.js' %}></script>
+{#        <script type="text/javascript" src={% static 'js/jquery-1.12.4.min.js' %}></script>#}
             <script type="text/javascript">
-                var $add_x = $('#add_cart').offset().top;
-                var $add_y = $('#add_cart').offset().left;
 
-                var $to_x = $('#show_count').offset().top;
-                var $to_y = $('#show_count').offset().left;
 
-                $(".add_jump").css({'left':$add_y+80,'top':$add_x+10,'display':'block'})
-                $('#add_cart').click(function(){
-                    $(".add_jump").stop().animate({
-                        'left': $to_y+7,
-                        'top': $to_x+7},
-                        "fast", function() {
-                            $(".add_jump").fadeOut('fast',function(){
-                                $('#show_count').html(2);
-                            });
+                    var $num = $('.num_show'),$add = $('.add'),$minus = $('.minus'),$show_count = $('#show_count'),
+                        $total = $('.total'),$add_cart = $('#add_cart'),$show_count = $('#show_count');
 
-                    });
-                })
+                    updata_goods()
+
+{#                    更新商品的总数数据#}
+                    function updata_goods() {
+                        var $value = parseFloat({{ goods_sku.price }})*1000 * parseFloat($('.num_show').val())/1000
+                        $('.total').children().html($value.toFixed(2))
+                    }
+
+                    {# 处理点击加数量的处理#}
+                    $('.add').click(function () {
+
+                        $('.num_show').val(parseInt($('.num_show').val())+ 1)
+                        updata_goods()
+
+                    })
+                   {# 处理点击减数量的处理#}
+                    $('.minus').click(function () {
+
+                        $('.num_show').val(parseInt($('.num_show').val())- 1)
+
+                        if ((isNaN($('.num_show').val())) || (!($('.num_show').val().trim())) || (parseInt($('.num_show').val())<1))
+
+                        {
+
+                            $('.num_show').val(1)
+
+                        }
+
+                        updata_goods()
+
+                    })
+                    {# 处理直接修改数量的处理#}
+                    $num.blur(function () {
+
+                        if (isNaN($(this).val()) || ! $(this).val().trim() || parseInt($(this).val())<1)
+
+                        {
+
+                            $(this).val(1)
+
+                        }
+
+                        updata_goods()
+
+                    })
+
+{#                  加入购物车#}
+                    $('#add_cart').click(function () {
+                        var token = $('input[name="csrfmiddlewaretoken"]').val();
+
+                        var $count = $('.num_show').val();
+                        $.post("{% url 'cart:add' %}",{'sku_id':{{goods_sku.id}},'count':$count,"csrfmiddlewaretoken":token},
+                        function (data) {
+{#                            alert(data.cart_count)#}
+                            $('#show_count').html(data.cart_count)
+
+                        }
+
+                        )
+                    })
             </script>
-    {% endblock %}
-
-{% endblock %}
+    {% endblock bottom_js%}
 
 
 

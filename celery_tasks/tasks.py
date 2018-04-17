@@ -79,7 +79,7 @@ def generate_static_index_html():
 
     index_html = template.render(data)
 
-    file_path = '/home/python/Desktop/celery_server/static/indexq.html'
+    file_path = '/home/python/Desktop/static/index.html'
 
     with open(file_path,'w') as f :
         f.write(index_html)

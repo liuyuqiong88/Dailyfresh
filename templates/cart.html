@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+{#{% csrf_token %}#}
+
+{% block title %}
+    天天生鲜-购物车
+{% endblock %}
+
+{% block search_bar %}
+
+    <div class="search_bar clearfix">
+        <a href="{% url 'goods:index' %}" class="logo fl"><img src={% static 'images/logo.png' %}></a>
+        <div class="sub_page_name fl">|&nbsp;&nbsp;&nbsp;&nbsp;购物车</div>
+
+        <div class="search_con fr">
+            <form action="/search/">
+                <input type="text" class="input_text fl" name="q" placeholder="搜索商品">
+                <input type="submit" class="input_btn fr" name="" value="搜索">
+            </form>
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block body %}
+      {% csrf_token %}
+    <div class="total_count">全部商品<em>{{ count_sum }}</em>件</div>
+    <ul class="cart_list_th clearfix">
+        <li class="col01">商品名称</li>
+        <li class="col02">商品单位</li>
+        <li class="col03">商品价格</li>
+        <li class="col04">数量</li>
+        <li class="col05">小计</li>
+        <li class="col06">操作</li>
+    </ul>
+
+    <form action="{% url 'orders:place' %}" method="post">
+      {% csrf_token %}
+    {% for sku in skus %}
+        <ul class="cart_list_td clearfix">
+            <li class="col01"><input type="checkbox" name="sku_ids" value="{{ sku.id }}" checked=""></li>
+            <li class="col02"><img src="{{ sku.default_image.url }}"></li>
+            <li class="col03">{{ sku.name }}<br><em>{{ sku.price }}　元/{{ sku.unit }}</em></li>
+            <li class="col04">{{ sku.unit }}</li>
+            <li class="col05"> {{ sku.price }}　元</li>
+            <li class="col06">
+                <div class="num_add">
+                    <a href="javascript:;" class="add fl">+</a>
+                    <input type="text" class="num_show fl" value="{{ sku.goods_count }}" sku_id = "{{ sku.id }}">
+                    <a href="javascript:;" class="minus fl">-</a>
+                </div>
+            </li>
+            <li class="col07">{{ sku.good_sum }}　元</li>
+            <li class="col08"><a href="javascript:;" id="del" sku_id = "{{ sku.id }}">删除</a></li>
+        </ul>
+    {% endfor %}
+
+    <ul class="settlements">
+        <li class="col01"><input type="checkbox" name="" checked=""></li>
+        <li class="col02">全选</li>
+        <li class="col03">合计(不含运费)：<span>¥</span><em>{{ price_sum }}</em><br>共计<b>{{ count_sum }}</b>件商品</li>
+        <li class="col04"><input type="submit" value="去结算"></li>
+    </ul>
+    </form>
+{% endblock %}
+
+{% block bottom_js %}
+    <script>
+        var $add = $('.add'), $minus = $('.minus'), $num_show = $('.num_show'), $settlements = $('.settlements');
+
+
+        {#        处理点击增加商品数量的事件#}
+        $add.click(function () {
+            var $cho_add = $(this);
+            var $num = parseInt($cho_add.next().val())
+
+            updata_goods($cho_add, $num, 1)
+
+            update_json($cho_add.next().attr('sku_id'),parseInt($cho_add.next().val()))
+        })
+
+
+        $('.minus').click(function () {
+            var $cho_add = $(this);
+            {#            var $cho_num_show = parseInt($cho_add.prev().val())#}
+
+            if (isNaN($cho_add.prev().val()) || !($cho_add.prev().val().trim()) || parseInt($cho_add.prev().val()) <= 1) {
+
+                updata_goods($cho_add, parseInt($cho_add.prev().val()), 0)
+            } else {
+                updata_goods($cho_add, parseInt($cho_add.prev().val()), -1)
+            }
+
+            update_json($cho_add.prev().attr('sku_id'),parseInt($cho_add.prev().val()))
+
+
+        })
+
+        $('.num_show').blur(function () {
+            var $choos = $(this);
+            {#            alert($choos)#}
+
+            if (isNaN($choos.val()) || $choos.val().trim().length == 0 || parseInt($choos.val()) < 1) {
+
+                $choos.val(1)
+
+                updata_goods($choos, parseInt($choos.val()), 0)
+            } else {
+
+                updata_goods($choos, parseInt($choos.val()), 0)
+
+            }
+            update_json($choos.attr('sku_id'),parseInt($choos.val()))
+        })
+
+        $('.cart_list_td').find(':checkbox').change(function () {
+            var is_checked = $(this).prop('checked');
+
+            update_goods_amount()
+
+        })
+
+        $('.settlements').find(':checkbox').change(function () {
+            var is_checked = $(this).prop('checked');
+            $('.cart_list_td').find(':checkbox').each(function () {
+                $(this).prop('checked', is_checked)
+                update_goods_amount()
+            });
+
+
+        })
+
+                // todo: 设置全选checkbox的勾选状态
+        // 给每个商品的checkbox设置状态监听
+        $('.cart_list_td').find(':checkbox').change(function () {
+            // 获取checkbox的总个数
+            var length = $('.cart_list_td').find(':checkbox').length;
+            // 获取勾选的checkbox的总个数
+            var length2 = $('.cart_list_td').find(':checked').length;
+            // 如果两者相等,则全选checkbox需要勾选上
+            if (length == length2) {
+                $('.settlements').find(':checkbox').prop('checked', true);
+            } else {
+                $('.settlements').find(':checkbox').prop('checked', false);
+            }
+
+            update_goods_amount();
+        })
+
+        $('.col08').find('a').click(function () {
+
+
+            del_json($(this).attr('sku_id'))
+        })
+        
+        function update_json(sku_id,count) {
+            var token = $('input[name="csrfmiddlewaretoken"]').val();
+            $.post("{% url 'cart:update' %}", {'sku_id': sku_id, "count": count,"csrfmiddlewaretoken":token},function (data) {
+
+            })
+        }
+
+        function del_json(sku_id) {
+            var token = $('input[name="csrfmiddlewaretoken"]').val();
+            var par = {'sku_id': sku_id, "csrfmiddlewaretoken":token}
+            $.post("{% url 'orders:delete' %}",par,
+            function (data) {
+
+                location.reload()
+            })
+        }
+
+
+        // todo: 更新商品的总数量和总金额
+        function update_goods_amount() {
+            // 获取到checkbox选中的多个ul元素
+            var total_count = 0;
+            var total_amount = 0;
+
+            // 获取选中的checkbox, 再获取父标签ul, 再作循环每一个ul标签
+            $('.cart_list_td').find(':checked').parents('ul').each(function () {
+                // 获取当前选中商品的数量和小计金额
+                var count = $(this).find('.num_show').val();
+                var price = $(this).find('.col05').text();
+                count = parseInt(count);
+                amount = parseFloat(price)*10000 * count/10000;
+                console.log('-----' + count + "   " + amount);
+                // 累加总数量和总金额
+                total_count += count;
+                total_amount += amount;
+            });
+
+            // 显示总数量和总金额
+            $('.total_count').children('em').html(total_count);
+            $('.settlements').find('b').html(total_count);
+            // toFixed: 保留小数点2位
+            $('.settlements').find('em').html(total_amount.toFixed(2));
+        }
+
+
+        {#                    更新商品的总数数据#}
+        function updata_goods(cho_add, num, spend) {
+
+            var $old_value = parseFloat(cho_add.parent().parent().next().html());
+            {#            修改改变后的商品数量#}
+
+            if (spend > 0) {
+                cho_add.next().val(num + spend)
+            } else if (spend < 0) {
+
+
+                cho_add.prev().val(num + spend)
+
+            }
+
+            {#            计算小计的显示价格#}
+
+            var $new_value = (parseFloat(cho_add.parent().parent().prev().html()) *10000 * (num + spend) /10000)
+
+
+            var $old_num = $old_value / parseFloat(cho_add.parent().parent().prev().html())
+
+            {#            取得显示小计的标签并修改#}
+            cho_add.parent().parent().next().html($new_value.toFixed(2) + "　元")
+
+            {#            改变修改后的总计商品数量#}
+            var $total_count = parseInt($('.total_count').children().html())
+            var $new_count = $total_count + num + spend - $old_num
+
+            $('.total_count').children().html($new_count)
+            $('.settlements').children('.col03').children('b').html($new_count)
+
+            {#          更新修改后的总计#}
+
+            var new_sum = parseFloat($('.settlements').children('.col03').children('em').html()) + ($new_value - $old_value)
+            $('.settlements').children('.col03').children('em').html(new_sum)
+        }
+    </script>
+{% endblock %}

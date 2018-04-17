@@ -1,47 +1,131 @@
- {% extends 'base_user_center.html' %}
-        {% block right_body %}
-            <div class="right_content clearfix">
-                <h3 class="common_title2">全部订单</h3>
+{% extends 'base_user_center.html' %}
+{#{% csrf_token %}#}
+{% block right_body %}
+    <div class="right_content clearfix">
+        <h3 class="common_title2">全部订单</h3>
 
-                <ul class="order_list_th w978 clearfix">
-                    <li class="col01">2016-8-21 17:36:24</li>
-                    <li class="col02">订单号：56872934</li>
-                    <li class="col02 stress">未支付</li>
-                </ul>
-                <table class="order_list_table w980">
-                    <tbody>
-                    <tr>
-                        <td width="55%">
-                            <ul class="order_goods_list clearfix">
-                                <li class="col01"><img src="images/goods02.jpg"></li>
-                                <li class="col02">嘎啦苹果嘎啦苹果<em>11.80元/500g</em></li>
-                                <li class="col03">1</li>
-                                <li class="col04">11.80元</li>
-                            </ul>
-                            <ul class="order_goods_list clearfix">
-                                <li class="col01"><img src="images/goods02.jpg"></li>
-                                <li class="col02">嘎啦苹果嘎啦苹果<em>11.80元/500g</em></li>
-                                <li class="col03">1</li>
-                                <li class="col04">11.80元</li>
-                            </ul>
-                        </td>
-                        <td width="15%">33.60元</td>
-                        <td width="15%">待付款</td>
-                        <td width="15%"><a href="#" class="oper_btn">去付款</a></td>
-                    </tr>
-                    </tbody>
-                </table>
 
-                <div class="pagenation">
-                    <a href="#">
-                        <上一页></上一页>
-                    </a>
-                    <a href="#" class="active">1</a>
-                    <a href="#">2</a>
-                    <a href="#">3</a>
-                    <a href="#">4</a>
-                    <a href="#">5</a>
-                    <a href="#">下一页></a>
-                </div>
-            </div>
-        {% endblock %}
+        {% for order in page %}
+            <ul class="order_list_th w978 clearfix">
+            <li class="col01">{{ order.create_time }}</li>
+            <li class="col02">订单号：{{ order.order_id }}</li>
+            <li class="col02 stress">{{ order.status }}</li>
+            {{ forloop.counter }}
+            <table class="order_list_table w980">
+            <tbody>
+            {% csrf_token %}
+            <tr>
+                <td width="55%">
+
+                    {% for ordergoods in order.order_goods %}
+
+                        <ul class="order_goods_list clearfix">
+                            <li class="col01 fl"><img src="{{ ordergoods.sku.default_image.url }}"></li>
+                            <li class="col02 fl" style="width:214px">{{ ordergoods.sku.name }}<em>{{ ordergoods.sku.price }}元/{{ ordergoods.sku.unit }}</em>
+                            </li>
+                            <li class="col03 fl">{{ ordergoods.count }}</li>
+                            <li class="col04 fl">{{ ordergoods.sum_price }}元</li>
+                        </ul>
+                    {% endfor %}
+
+
+                </td>
+                <td width="15%">{{ order.order_price }}元</td>
+
+
+
+                <td width="15%">待付款</td>
+                <td width="15%"><a href="#" class="oper_btn" order_id = "{{ order.order_id }}">去付款</a></td>
+            </tr>
+            </tbody>
+        </table>
+        </ul>
+        {% endfor %}
+
+{#        <ul class="order_list_th w978 clearfix">#}
+{#            <li class="col01">{{ order.create_time }}</li>#}
+{#            <li class="col02">订单号：{{ order.order_id }}</li>#}
+{#            <li class="col02 stress">{{ order.status }}</li>#}
+{#        </ul>#}
+{#        <table class="order_list_table w980">#}
+{#            <tbody>#}
+{#            {% csrf_token %}#}
+{#            <tr>#}
+{#                <td width="55%">#}
+{##}
+{#                    {% for ordergoods in page %}#}
+{#                        <ul class="order_goods_list clearfix">#}
+{#                            <li class="col01"><img src="{{ ordergoods.sku.default_image.url }}"></li>#}
+{#                            <li class="col02">{{ ordergoods.sku.name }}<em>{{ ordergoods.sku.price }}元/{{ ordergoods.sku.unit }}</em>#}
+{#                            </li>#}
+{#                            <li class="col03">{{ ordergoods.count }}</li>#}
+{#                            <li class="col04">{{ ordergoods.sum_price }}元</li>#}
+{#                        </ul>#}
+{#                    {% endfor %}#}
+{##}
+{##}
+{#                </td>#}
+{#                <td width="15%">{{ 33.06 }}元</td>#}
+{##}
+{##}
+{##}
+{#                <td width="15%">待付款</td>#}
+{#                <td width="15%"><a href="#" class="oper_btn">去付款</a></td>#}
+{#            </tr>#}
+{#            </tbody>#}
+{#        </table>#}
+
+        <div class="pagenation">
+            {% if page.number > 1 %}
+                <a href="{% url 'orders:order' 1 %}">
+                    &lt;上一页
+                </a>
+
+            {% endif %}
+            {% for foo in paginator.page_range %}
+                {% if foo == page.num  %}
+                     <a href="#" class="active">{{ foo }}</a>
+                {% else %}
+                    <a href="{% url 'orders:order' foo %}" >{{ foo }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page.number < paginator.num_pages %}
+                <a href="{% url 'orders:order' page.next_page_number %} ">下一页&gt;</a>
+            {% endif %}
+
+
+        </div>
+    </div>
+    {% csrf_token %}
+{% endblock %}
+
+{% block bottom_js %}
+
+    <script >
+
+        $('.oper_btn').click(function () {
+
+            var token = $('input[name="csrfmiddlewaretoken"]').val();
+            var params = {
+                "csrfmiddlewaretoken" : token,
+                "order_id": $(this).attr('order_id'),
+            }
+
+            $.post("{% url 'orders:pay' %}",params,
+            function (data) {
+                alert(data.pay_url)
+
+                window.open(data.pay_url)
+                $.post("/orders/check",params,
+                function (data_01) {
+                    if (data_01.code == 0){
+                        window.location.reload()
+                    }else {
+                        alert(data_01.message)
+                    }
+                })
+            })
+        })
+    </script>
+{% endblock %}
